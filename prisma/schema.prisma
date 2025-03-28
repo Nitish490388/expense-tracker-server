@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  contributions Contribution[]
+  expenses     Expense[]
+  refunds      Refunds[]
+}
+
+model Refunds {
+  id      String @id @default(uuid())
+  amount      Float
+  type     ExpenseType
+  player      Player    @relation(fields: [playerId], references: [id])
+  playerId    String
+  date     DateTime @default(now())
+}
+
+model Contribution {
+  id       String   @id @default(uuid())
+  amount   Float
+  type     ExpenseType
+  player   Player   @relation(fields: [playerId], references: [id])
+  playerId String
+  date     DateTime @default(now())
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  description String
+  amount      Float
+  type        ExpenseType
+  date        DateTime @default(now())
+  paidBy      Player   @relation(fields: [playerId], references: [id])
+  playerId    String
+}
+
+enum ExpenseType {
+  MATCHDAY
+  EQUIPMENT
+}
