@@ -14,40 +14,41 @@ datasource db {
 }
 
 model Player {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  password     String
+  id            String         @id @default(uuid())
+  profilePic    String?
+  name          String
+  email         String         @unique
+  password      String
   contributions Contribution[]
-  expenses     Expense[]
-  refunds      Refunds[]
+  expenses      Expense[]
+  refunds       Refunds[]
 }
 
 model Refunds {
-  id      String @id @default(uuid())
-  amount      Float
+  id       String      @id @default(uuid())
+  amount   Float
   type     ExpenseType
-  player      Player    @relation(fields: [playerId], references: [id])
-  playerId    String
-  date     DateTime @default(now())
+  player   Player      @relation(fields: [playerId], references: [id])
+  playerId String
+  date     DateTime    @default(now())
 }
 
 model Contribution {
-  id       String   @id @default(uuid())
+  id       String      @id @default(uuid())
   amount   Float
   type     ExpenseType
-  player   Player   @relation(fields: [playerId], references: [id])
+  player   Player      @relation(fields: [playerId], references: [id])
   playerId String
-  date     DateTime @default(now())
+  date     DateTime    @default(now())
 }
 
 model Expense {
-  id          String   @id @default(uuid())
+  id          String      @id @default(uuid())
   description String
   amount      Float
   type        ExpenseType
-  date        DateTime @default(now())
-  paidBy      Player   @relation(fields: [playerId], references: [id])
+  date        DateTime    @default(now())
+  paidBy      Player      @relation(fields: [playerId], references: [id])
   playerId    String
 }
 
