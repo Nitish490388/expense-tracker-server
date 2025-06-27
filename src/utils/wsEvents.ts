@@ -1,0 +1,4 @@
+export enum WSEventType {
+  CASH_UPDATED = "CASH_UPDATED",
+  EXPENSE_ADDED = "EXPENSE_ADDED",
+}

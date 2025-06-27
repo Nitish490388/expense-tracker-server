@@ -36,8 +36,7 @@ const signupController = async (req: Request, res: Response) => {
         password: haskedPassword,
       },
     });
-
-    console.log(user);
+  
     const secret: string = process.env.JWT_SECRET || "";
 
     const jwt_secret: string = process.env.JWT_ACCESS_SECRET || "";
@@ -45,6 +44,12 @@ const signupController = async (req: Request, res: Response) => {
       expiresIn: "3d",
     });
 
+    res.cookie("token", token, {
+      // path: "/",
+      // sameSite: "lax",
+      // httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
+    });
     res.send(success(201, {token}));
     return;
   } catch (err) {
@@ -68,7 +73,7 @@ const signinController = async (req: Request, res: Response) => {
         }
         const matched = await bcrypt.compare(password, user?.password as string);
         if(!matched) {
-            res.send(error(400, "Invalid credential!!"));
+            res.send(error(401, "Invalid credential!!"));
             return;
         }
 
@@ -83,8 +88,14 @@ const signinController = async (req: Request, res: Response) => {
                 expiresIn: "3d"
             },
         );
-
+        res.cookie("token", token, {
+          // path: "/",
+          // sameSite: "lax",
+          // httpOnly: true,
+          expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
+        });
         res.send(success(201, {token}));
+        return;
     } catch (err) {
       console.log(err);
       res.send(error(505, "Error occured"));
@@ -93,7 +104,21 @@ const signinController = async (req: Request, res: Response) => {
 
 const logoutController = (req: Request, res: Response) => {
   try {
-    res.send(success(201, {result: "User logged out!"}))
+    res.clearCookie("token");
+    // req.session = null;
+    
+    res.send(success(200, { msg: "user logged out successfully" }));
+  } catch (err) {
+    console.log(error);
+    res.send(error(505, "Error occusred"));
+  }
+};
+
+const getAllPlayers = async (req: Request, res: Response) => {
+  try {
+    
+    const result = await Prisma.player.findMany();
+    res.send(success(201, result));
   } catch (err) {
     console.log(error);
     res.send(error(505, "Error occusred"));
@@ -104,5 +129,6 @@ export {
     check,
     signupController,
     signinController,
-    logoutController
+    logoutController,
+    getAllPlayers
  };

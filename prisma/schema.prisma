@@ -18,7 +18,7 @@ model Player {
   profilePic    String?
   name          String
   email         String         @unique
-  password      String
+  password      String?
   contributions Contribution[]
   expenses      Expense[]
   refunds       Refunds[]
@@ -26,8 +26,8 @@ model Player {
 
 model Refunds {
   id       String      @id @default(uuid())
-  amount   Float
-  type     ExpenseType
+  amount   Int
+  type     Type
   player   Player      @relation(fields: [playerId], references: [id])
   playerId String
   date     DateTime    @default(now())
@@ -35,24 +35,38 @@ model Refunds {
 
 model Contribution {
   id       String      @id @default(uuid())
-  amount   Float
-  type     ExpenseType
+  amount   Int
+  type     Type       
   player   Player      @relation(fields: [playerId], references: [id])
   playerId String
+  status   Status      @default(PENDING)
   date     DateTime    @default(now())
 }
 
 model Expense {
   id          String      @id @default(uuid())
   description String
-  amount      Float
-  type        ExpenseType
+  amount      Int       
+  expenseType        Type        
   date        DateTime    @default(now())
   paidBy      Player      @relation(fields: [playerId], references: [id])
   playerId    String
 }
 
-enum ExpenseType {
+model availableFund {
+  id String @id @default(uuid())
+  type Type @unique
+  amount Int
+  updatedAt DateTime @updatedAt
+}
+
+enum Type {
   MATCHDAY
   EQUIPMENT
+}
+
+enum Status {
+  PENDING
+  PAID
+  DECLINED
 }
