@@ -66,4 +66,82 @@ const getDataController = async (req: Request, res: Response) => {
   }
 };
 
-export { getDataController };
+const createMatchdaySessionController = async (req: Request, res: Response) => {
+  try {
+    const {selectedPlayers, title} = req.body;
+    // console.log(title);
+
+    const session = await prisma.expenseSession.create({
+      data: {
+        title,
+         players: {
+           connect: selectedPlayers.map((id: string) => ({ id }))
+          },
+        type: "MATCHDAY"
+      }
+    });
+
+    console.log(session);  
+    res.send(success(201, {msg: "Success in creating a session!!"}));
+    
+  } catch (err) {
+    console.log(err);
+    res.send(error(500, "Internal Error Occured!!"));
+  }
+}
+
+const getSessionDataById = async (req: Request, res: Response) => {
+  try {
+    const sessionData = await prisma.expenseSession.findUnique({
+    where: { id: req.params.id },
+    include: {
+      players: true,
+      expenses: {
+        include: {
+          paidBy: true
+        }
+      },
+      contributions: {
+        include: {
+          player: true
+        }
+      }
+    },
+  });
+
+  res.send(success(201, {sessionData}));
+
+  } catch (err) {
+    console.log(err);
+    res.send(error(500, "Internal Error Occured!!"));
+  }
+}
+
+
+const getSessions = async (req: Request, res: Response) => {
+  try {
+    
+    const sessions = await prisma.expenseSession.findMany({
+      where: {
+        type: "MATCHDAY"
+      },
+      include: {
+        players: true
+      }
+    });
+  res.send(success(201, {sessions}));
+
+  } catch (err) {
+    console.log(err);
+    res.send(error(500, "Internal Error Occured!!"));
+  }
+}
+
+
+
+export { 
+  getDataController,
+  createMatchdaySessionController,
+  getSessionDataById,
+  getSessions
+ };

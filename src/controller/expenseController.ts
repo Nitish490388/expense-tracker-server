@@ -13,6 +13,7 @@ interface addExpenceRequest {
   amount: number;
   expenseType: string;
   playerId: string;
+  sessionId: string
 }
 
 const addExpence = async (
@@ -21,13 +22,14 @@ const addExpence = async (
 ) => {
   try {
     const playerId = req.userId as string;
-    const { description, amount, expenseType } = req.body;
+    const { description, amount, expenseType, sessionId } = req.body;
     const expense = await prisma.expense.create({
       data: {
         description,
         amount,
         expenseType: expenseType as Type,
-        playerId,
+        playerId, 
+        sessionId
       },
     });
 

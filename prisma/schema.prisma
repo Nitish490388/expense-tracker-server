@@ -13,12 +13,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model ExpenseSession {
+  id String @id @default(uuid())
+  title  String
+  type Type
+  settles Boolean @default(false)
+  players Player[] @relation("SessionPlayers")
+  expenses Expense[]
+  contributions  Contribution[]
+}
+
 model Player {
   id            String         @id @default(uuid())
   profilePic    String?
   name          String
   email         String         @unique
   password      String?
+  sessions        ExpenseSession[] @relation("SessionPlayers")
   contributions Contribution[]
   expenses      Expense[]
   refunds       Refunds[]
@@ -30,6 +41,7 @@ model Refunds {
   type     Type
   player   Player      @relation(fields: [playerId], references: [id])
   playerId String
+  status   Status
   date     DateTime    @default(now())
 }
 
@@ -41,6 +53,8 @@ model Contribution {
   playerId String
   status   Status      @default(PENDING)
   date     DateTime    @default(now())
+  session  ExpenseSession @relation(fields: [sessionId], references: [id])
+  sessionId String
 }
 
 model Expense {
@@ -51,6 +65,9 @@ model Expense {
   date        DateTime    @default(now())
   paidBy      Player      @relation(fields: [playerId], references: [id])
   playerId    String
+
+  session     ExpenseSession @relation(fields: [sessionId], references: [id])
+  sessionId   String
 }
 
 model availableFund {
