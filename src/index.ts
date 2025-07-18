@@ -7,12 +7,14 @@ import playerRouter from "../src/routes/players";
 import expenseRouter from "../src/routes/expense";
 import equipmentRouter from "../src/routes/equipment";
 import matchdayRouter from "../src/routes/matchday";
+import contributionRouter from "../src/routes/contribution";
 import auth from "./routes/auth";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import "./config/passport";
 import verifyToken from "./middlewares/verifyUser";
 import appRouter from "../src/routes/appRouter";
+import "../src/cron/contributionJob";
 
 import http from "http";
 import WebSocket, { WebSocketServer } from "ws";
@@ -57,7 +59,8 @@ app.use("/api/v1/player", playerRouter);
 app.use("/api/v1/expence", verifyToken, expenseRouter);
 app.use("/api/v1/equiment", equipmentRouter);
 app.use("/api/v1/matchday", matchdayRouter);
-app.use( "/api/v1/app", appRouter);
+app.use("/api/v1/app", appRouter);
+app.use("/api/v1/app", contributionRouter);
 
 const httpServer = app.listen(PORT, () => {
     console.log("Server is started and running at port no: ", PORT);

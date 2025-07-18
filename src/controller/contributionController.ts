@@ -1,48 +1,69 @@
-import {
-    Response,
-    Request
-} from "express";
-import { success, error } from "../utils/responseWrapper";
+import { Request, Response } from "express";
 import { PrismaClient, Status, Type } from "@prisma/client";
-
-interface addExpenceRequest {
-    description: string;
-    amount: number;
-    type: Type
-    playerId: string;
-    status: Status;
-}
+import { success, error } from "../utils/responseWrapper";
 
 const prisma = new PrismaClient();
 
-const createContributions = async (req: Request<{}, {}, addExpenceRequest>, res: Response) => {
-    try {
-        const {amount, type, playerId} = req.body;
-        const contibution = await prisma.contribution.create({
-            data: {
-                amount,
-                type,
-                playerId
-            }
-        });
-        await prisma.availableFund.update({
-            where: {
-                type: type
-            }, data: {
-                amount: {increment: amount}
-            }
-        })
-        res.send(success(201, {result: "Contribution Created!!"}));
-    } catch (err) {
-        console.log(err);
-        res.send(error(500, "Error occured!"));
+export const markContributionAsPaid = async (req: Request, res: Response) => {
+  const { contributionId, playerId } = req.body;
+
+  if (!contributionId || !playerId) {
+    res
+      .status(400)
+      .json(error(400, "contributionId and playerId are required."));
+    return;
+  }
+
+  try {
+    const contribution = await prisma.contribution.findUnique({
+      where: { id: contributionId },
+    });
+
+    if (!contribution) {
+      res.status(404).json(error(404, "Contribution not found."));
+      return;
     }
-}
 
-const updateContributions = async (req: Request, res: Response) => {
-    
-}
+    if (contribution.playerId !== playerId) {
+      res
+        .status(403)
+        .json(
+          error(403, "You are not authorized to update this contribution.")
+        );
+      return;
+    }
 
-export {
-    createContributions
-}
+    if (contribution.type !== Type.MATCHDAY) {
+      res
+        .status(400)
+        .json(
+          error(400, "Only MATCHDAY contributions can be marked this way.")
+        );
+      return;
+    }
+
+    if (contribution.status === Status.PAID) {
+      res
+        .status(400)
+        .json(error(400, "This contribution is already marked as PAID."));
+      return;
+    }
+
+    const updated = await prisma.contribution.update({
+      where: { id: contributionId },
+      data: { status: Status.PAID },
+    });
+
+    res
+      .status(200)
+      .json(
+        success(200, {
+          message: "Contribution marked as PAID",
+          contribution: updated,
+        })
+      );
+  } catch (err) {
+    console.error("Error updating contribution status:", err);
+    res.status(500).json(error(500, "Internal server error."));
+  }
+};

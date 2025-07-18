@@ -21,6 +21,7 @@ model ExpenseSession {
   players Player[] @relation("SessionPlayers")
   expenses Expense[]
   contributions  Contribution[]
+  createdAt DateTime @default(now())
 }
 
 model Player {
