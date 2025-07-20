@@ -5,10 +5,15 @@ import { PrismaClient, Type, Status } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-cron.schedule("59 23 * * *", async () => {
+cron.schedule("12 7 * * *", async () => {
   try {
     const today = dayjs().startOf("day").toDate();
     const tomorrow = dayjs().add(1, "day").startOf("day").toDate();
+
+    console.log(today);
+    console.log(tomorrow);
+    
+    
 
     const sessions = await prisma.expenseSession.findMany({
       where: {

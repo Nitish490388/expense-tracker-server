@@ -36,7 +36,7 @@ const signupController = async (req: Request, res: Response) => {
         password: haskedPassword,
       },
     });
-  
+
     const secret: string = process.env.JWT_SECRET || "";
 
     const jwt_secret: string = process.env.JWT_ACCESS_SECRET || "";
@@ -50,7 +50,7 @@ const signupController = async (req: Request, res: Response) => {
       // httpOnly: true,
       expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
     });
-    res.send(success(201, {token}));
+    res.send(success(201, { token }));
     return;
   } catch (err) {
     console.log(error);
@@ -60,53 +60,53 @@ const signupController = async (req: Request, res: Response) => {
 };
 
 const signinController = async (req: Request, res: Response) => {
-    try {
-        const {email, password} = req.body;
-        const user = await Prisma.player.findFirst({
-            where: {
-                email
-            }
-        });
-        if(!user) {
-            res.send(error(404, "Email not found. Please create an account!"));
-            return;
-        }
-        const matched = await bcrypt.compare(password, user?.password as string);
-        if(!matched) {
-            res.send(error(401, "Invalid credential!!"));
-            return;
-        }
-
-        const jwt_secret: string = process.env.JWT_SECRET || "";
-        const token = await jwt.sign(
-            {
-                id: user?.id,
-                email: user?.email
-            },
-            jwt_secret,
-            {
-                expiresIn: "3d"
-            },
-        );
-        res.cookie("token", token, {
-          // path: "/",
-          // sameSite: "lax",
-          // httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
-        });
-        res.send(success(201, {token}));
-        return;
-    } catch (err) {
-      console.log(err);
-      res.send(error(505, "Error occured"));
+  try {
+    const { email, password } = req.body;
+    const user = await Prisma.player.findFirst({
+      where: {
+        email,
+      },
+    });
+    if (!user) {
+      res.send(error(404, "Email not found. Please create an account!"));
+      return;
     }
+    const matched = await bcrypt.compare(password, user?.password as string);
+    if (!matched) {
+      res.send(error(401, "Invalid credential!!"));
+      return;
+    }
+
+    const jwt_secret: string = process.env.JWT_SECRET || "";
+    const token = await jwt.sign(
+      {
+        id: user?.id,
+        email: user?.email,
+      },
+      jwt_secret,
+      {
+        expiresIn: "3d",
+      }
+    );
+    res.cookie("token", token, {
+      // path: "/",
+      // sameSite: "lax",
+      // httpOnly: true,
+      expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
+    });
+    res.send(success(201, { token }));
+    return;
+  } catch (err) {
+    console.log(err);
+    res.send(error(505, "Error occured"));
+  }
 };
 
 const logoutController = (req: Request, res: Response) => {
   try {
     res.clearCookie("token");
     // req.session = null;
-    
+
     res.send(success(200, { msg: "user logged out successfully" }));
   } catch (err) {
     console.log(error);
@@ -116,7 +116,6 @@ const logoutController = (req: Request, res: Response) => {
 
 const getAllPlayers = async (req: Request, res: Response) => {
   try {
-    
     const result = await Prisma.player.findMany();
     res.send(success(201, result));
   } catch (err) {
@@ -125,10 +124,42 @@ const getAllPlayers = async (req: Request, res: Response) => {
   }
 };
 
-export { 
-    check,
-    signupController,
-    signinController,
-    logoutController,
-    getAllPlayers
- };
+const markPlayerAsApproved = async (req: Request, res: Response) => {
+  try {
+    const { id, isApproved} = req.body;
+    const updated = await Prisma.player.update({
+      where: { id },
+      data: { isApproved },
+    });
+    res.send(success(201, {result: "Player marked as approved"}));
+  } catch (err) {
+    console.log(error);
+    res.send(error(505, "Error occusred"));
+  }
+};
+
+const getNotApprovedPlayers = async (req: Request, res: Response) => {
+  try {
+    const players = await Prisma.player.findMany({
+      where: {
+        isApproved: false
+      }
+    })
+    res.send(success(201, {players}));
+  } catch (err) {
+    console.log(error);
+    res.send(error(505, "Error occusred"));
+  }
+};
+
+
+
+export {
+  check,
+  signupController,
+  signinController,
+  logoutController,
+  getAllPlayers,
+  markPlayerAsApproved,
+  getNotApprovedPlayers
+};

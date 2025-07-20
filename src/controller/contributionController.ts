@@ -15,44 +15,25 @@ export const markContributionAsPaid = async (req: Request, res: Response) => {
   }
 
   try {
-    const contribution = await prisma.contribution.findUnique({
-      where: { id: contributionId },
-    });
-
-    if (!contribution) {
-      res.status(404).json(error(404, "Contribution not found."));
-      return;
-    }
-
-    if (contribution.playerId !== playerId) {
-      res
-        .status(403)
-        .json(
-          error(403, "You are not authorized to update this contribution.")
-        );
-      return;
-    }
-
-    if (contribution.type !== Type.MATCHDAY) {
-      res
-        .status(400)
-        .json(
-          error(400, "Only MATCHDAY contributions can be marked this way.")
-        );
-      return;
-    }
-
-    if (contribution.status === Status.PAID) {
-      res
-        .status(400)
-        .json(error(400, "This contribution is already marked as PAID."));
-      return;
-    }
 
     const updated = await prisma.contribution.update({
       where: { id: contributionId },
       data: { status: Status.PAID },
     });
+
+    const unpaid = await prisma.contribution.findMany({
+      where: {
+        sessionId: updated.sessionId,
+        status: { not: "PAID" },
+      }
+    })
+
+    if (unpaid.length === 0) {
+       await prisma.expenseSession.update({
+        where: { id: updated.sessionId },
+        data: { settles: true },
+      });
+    }
 
     res
       .status(200)

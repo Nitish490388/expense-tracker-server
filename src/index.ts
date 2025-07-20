@@ -8,6 +8,8 @@ import expenseRouter from "../src/routes/expense";
 import equipmentRouter from "../src/routes/equipment";
 import matchdayRouter from "../src/routes/matchday";
 import contributionRouter from "../src/routes/contribution";
+import galleryAdmin from "../src/routes/admin/gallery";
+import gallery from "../src/routes/gallery";
 import auth from "./routes/auth";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -55,12 +57,15 @@ app.get('/', (req: Request, res: Response) => {
      res.send('Hello, world!');
 });
 
+
 app.use("/api/v1/player", playerRouter);
 app.use("/api/v1/expence", verifyToken, expenseRouter);
 app.use("/api/v1/equiment", equipmentRouter);
 app.use("/api/v1/matchday", matchdayRouter);
 app.use("/api/v1/app", appRouter);
 app.use("/api/v1/app", contributionRouter);
+app.use("/api/v1/admin/gallery", galleryAdmin);
+app.use("/api/v1/gallery", gallery);
 
 const httpServer = app.listen(PORT, () => {
     console.log("Server is started and running at port no: ", PORT);

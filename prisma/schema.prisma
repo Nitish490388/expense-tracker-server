@@ -13,6 +13,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model GalleryPost {
+  id          String         @id @default(uuid())
+  title       String
+  description String?
+  createdAt   DateTime       @default(now())
+  media       GalleryMedia[]
+}
+
+model GalleryMedia {
+  id        String   @id @default(uuid())
+  url       String
+  type      String   
+  thumbnail String?  
+  postId    String
+  post      GalleryPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+
+
 model ExpenseSession {
   id String @id @default(uuid())
   title  String
@@ -30,6 +49,7 @@ model Player {
   name          String
   email         String         @unique
   password      String?
+  isApproved    Boolean        @default(false)
   sessions        ExpenseSession[] @relation("SessionPlayers")
   contributions Contribution[]
   expenses      Expense[]
