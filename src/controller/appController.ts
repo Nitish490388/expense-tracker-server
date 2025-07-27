@@ -20,8 +20,8 @@ const getAvailableFund = async (req: Request, res: Response) => {
     ]);
 
     const data = {
-      matchdayBalance: data1?.amount,
-      equipmentBalance: data2?.amount
+      equipmentBalance: data1?.amount,
+      matchdayBalance: data2?.amount
     }
 
     res.send(success(201, data));
