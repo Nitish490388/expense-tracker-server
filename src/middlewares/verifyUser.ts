@@ -15,8 +15,6 @@ interface JwtPayload {
   }
 
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    
-   
     try {
       const token = req.cookies.token;
   

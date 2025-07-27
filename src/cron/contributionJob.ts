@@ -5,7 +5,7 @@ import { PrismaClient, Type, Status } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-cron.schedule("12 7 * * *", async () => {
+cron.schedule("59 23 * * *", async () => {
   try {
     const today = dayjs().startOf("day").toDate();
     const tomorrow = dayjs().add(1, "day").startOf("day").toDate();

@@ -62,8 +62,8 @@ app.use("/api/v1/player", playerRouter);
 app.use("/api/v1/expence", verifyToken, expenseRouter);
 app.use("/api/v1/equiment", equipmentRouter);
 app.use("/api/v1/matchday", matchdayRouter);
-app.use("/api/v1/app", appRouter);
-app.use("/api/v1/app", contributionRouter);
+app.use("/api/v1/app", verifyToken, appRouter);
+app.use("/api/v1/contributions",verifyToken, contributionRouter);
 app.use("/api/v1/admin/gallery", galleryAdmin);
 app.use("/api/v1/gallery", gallery);
 

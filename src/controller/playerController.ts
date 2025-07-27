@@ -152,8 +152,6 @@ const getNotApprovedPlayers = async (req: Request, res: Response) => {
   }
 };
 
-
-
 export {
   check,
   signupController,

@@ -4,7 +4,7 @@ import { success, error } from "../utils/responseWrapper";
 
 const prisma = new PrismaClient();
 
-export const markContributionAsPaid = async (req: Request, res: Response) => {
+const markContributionAsPaid = async (req: Request, res: Response) => {
   const { contributionId, playerId } = req.body;
 
   if (!contributionId || !playerId) {
@@ -48,3 +48,31 @@ export const markContributionAsPaid = async (req: Request, res: Response) => {
     res.status(500).json(error(500, "Internal server error."));
   }
 };
+
+const getPendingContribution = async (req: Request, res: Response) => {
+  try {
+    const userId = req.userId;
+    if(!userId) {
+      res.send(error(400, "Un authorized access"));
+    }
+
+    const pendingContributions = await prisma.contribution.findMany({
+      where: {
+        playerId: userId,
+        status: "PENDING"
+      },
+      include: {
+        session: true
+      }
+    })
+    res.send(success(201, {pendingContributions}));
+  } catch (err) {
+    console.log(error);
+    res.send(error(505, "Error occusred"));
+  }
+};
+
+export {
+  getPendingContribution,
+  markContributionAsPaid
+}
