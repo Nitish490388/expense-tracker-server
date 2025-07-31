@@ -105,6 +105,11 @@ const getSessionDataById = async (req: Request, res: Response) => {
         include: {
           player: true
         }
+      },
+      refunds: {
+        include: {
+          player: true
+        }
       }
     },
   });

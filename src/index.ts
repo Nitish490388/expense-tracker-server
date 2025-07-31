@@ -17,9 +17,11 @@ import "./config/passport";
 import verifyToken from "./middlewares/verifyUser";
 import appRouter from "../src/routes/appRouter";
 import "../src/cron/contributionJob";
+import refundRouters from "../src/routes/refund"
 
 import http from "http";
 import WebSocket, { WebSocketServer } from "ws";
+import { ensureApproved } from "./middlewares/ensureApproved";
 
 
 
@@ -33,7 +35,7 @@ const PORT = process.env.PORT || 8001;
 
 const corsOptions = {
   origin: process.env.CORS_URL,
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+  optionsSuccessStatus: 200 
 }
 
 app.use(cookieParser());
@@ -59,11 +61,12 @@ app.get('/', (req: Request, res: Response) => {
 
 
 app.use("/api/v1/player", playerRouter);
-app.use("/api/v1/expence", verifyToken, expenseRouter);
+app.use("/api/v1/expence", verifyToken,ensureApproved, expenseRouter);
 app.use("/api/v1/equiment", equipmentRouter);
 app.use("/api/v1/matchday", matchdayRouter);
-app.use("/api/v1/app", verifyToken, appRouter);
-app.use("/api/v1/contributions",verifyToken, contributionRouter);
+app.use("/api/v1/app", verifyToken,ensureApproved, appRouter);
+app.use("/api/v1/contributions",verifyToken,ensureApproved, contributionRouter);
+app.use("/api/v1/refunds",verifyToken,ensureApproved, refundRouters);
 app.use("/api/v1/admin/gallery", galleryAdmin);
 app.use("/api/v1/gallery", gallery);
 

@@ -1,10 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response, NextFunction } from "express";
+import { error } from "../utils/responseWrapper";
 
 interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-  };
+  userId?: string;
 }
 
 const prisma = new PrismaClient();
@@ -13,24 +12,25 @@ export const ensureApproved = async (
   res: Response,
   next: NextFunction
 ) => {
-  const playerId = req.user?.id;
+  const playerId = req.userId;
 
   if (!playerId) {
-    return res.status(401).json({ error: "Unauthorized: No user ID found." });
+    res.send(error(401, "Unauthorized: No user ID found."));
+    return ;
   }
 
   try {
     const player = await prisma.player.findUnique({ where: { id: playerId } });
 
     if (!player?.isApproved) {
-      return res
-        .status(403)
-        .json({ error: "Access denied. Waiting for admin approval." });
+      res.send(error(402, "Access denied. Waiting for admin approval."));
+      return;
     }
 
     next();
-  } catch (error) {
-    console.error("Error in ensureApproved middleware:", error);
-    res.status(500).json({ error: "Internal server error." });
+  } catch (err) {
+    console.error("Error in ensureApproved middleware:", err);
+    res.send(error(401, "Internal server error."));
+    return;
   }
 };

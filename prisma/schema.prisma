@@ -30,8 +30,6 @@ model GalleryMedia {
   post      GalleryPost @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
-
-
 model ExpenseSession {
   id String @id @default(uuid())
   title  String
@@ -40,6 +38,7 @@ model ExpenseSession {
   players Player[] @relation("SessionPlayers")
   expenses Expense[]
   contributions  Contribution[]
+  refunds   Refunds[]
   createdAt DateTime @default(now())
 }
 
@@ -64,6 +63,8 @@ model Refunds {
   playerId String
   status   Status
   date     DateTime    @default(now())
+  sessionId String
+  session  ExpenseSession   @relation(fields: [sessionId], references: [id])
 }
 
 model Contribution {

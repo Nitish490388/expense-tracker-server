@@ -47,7 +47,8 @@ const getProfileData = async (req: Request, res: Response) => {
         id: true,
         name: true,
         profilePic: true,
-        email: true
+        email: true,
+        isApproved: true
       }
     });
 
