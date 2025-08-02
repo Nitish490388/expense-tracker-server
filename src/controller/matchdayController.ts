@@ -8,63 +8,74 @@ const getDataController = async (req: Request, res: Response) => {
   try {
     const { fromDate, toDate } = req.query;
 
-    // Define base filters
-    const dateFilter: Prisma.DateTimeFilter = {};
-
-    if (fromDate) {
-      dateFilter.gte = new Date(fromDate as string);
-    }
-
-    if (toDate) {
-      dateFilter.lte = new Date(toDate as string);
-    }
-
-    const contributionFilter: Prisma.ContributionWhereInput = {
+    const dateFilter: Prisma.ExpenseSessionWhereInput = {
       type: Type.MATCHDAY,
-      ...(Object.keys(dateFilter).length > 0 && { date: dateFilter }),
     };
 
-    const expenseFilter: Prisma.ExpenseWhereInput = {
-      expenseType: Type.MATCHDAY,
-      ...(Object.keys(dateFilter).length > 0 && { date: dateFilter }),
-    };
+    if (fromDate && toDate) {
+      dateFilter.createdAt = {
+        gte: new Date(fromDate as string),
+        lte: new Date(toDate as string),
+      };
+    } else if (fromDate) {
+      dateFilter.createdAt = {
+        gte: new Date(fromDate as string),
+      };
+    } else if (toDate) {
+      dateFilter.createdAt = {
+        lte: new Date(toDate as string),
+      };
+    }
 
-    // Fetch data
-    const [contributions, expenses, contributionAgg, expenseAgg] =
-      await Promise.all([
-        prisma.contribution.findMany({
-          where: contributionFilter,
-          include: { player: true },
-        }),
-        prisma.expense.findMany({
-          where: expenseFilter,
-          include: { paidBy: true },
-        }),
-        prisma.contribution.aggregate({
-          _sum: { amount: true },
-          where: {
-            type: Type.MATCHDAY,
-            status: "PAID",
-          },
-        }),
-        prisma.expense.aggregate({
-          _sum: { amount: true },
-          where: {
-            expenseType: Type.MATCHDAY,
-          },
-        }),
-      ]);
+    // Fetch all matchday sessions in range
+    const sessions = await prisma.expenseSession.findMany({
+      where: dateFilter,
+      include: {
+        contributions: { include: { player: true } },
+        expenses: { include: { paidBy: true } },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-    const totalContributions = contributionAgg._sum.amount ?? 0;
-    const totalExpenses = expenseAgg._sum.amount ?? 0;
+    // Calculate total available fund
+    let totalContributions = 0;
+    let totalExpenses = 0;
+
+    const sessionsWithFund = sessions.map((session) => {
+      const contributionSum = session.contributions.reduce(
+        (sum, c) => sum + (c.status === "PAID" ? c.amount : 0),
+        0
+      );
+      const expenseSum = session.expenses.reduce((sum, e) => sum + e.amount, 0);
+
+      totalContributions += contributionSum;
+      totalExpenses += expenseSum;
+
+      return {
+        ...session,
+        availableFund: contributionSum - expenseSum,
+      };
+    });
+
     const availableFund = totalContributions - totalExpenses;
 
-    res.send(success(201, { availableFund, contributions, expenses }));
+     res.send(
+      success(201, {
+        availableFund,
+        sessions: sessionsWithFund,
+      })
+      
+    );
+    return;
   } catch (err) {
-    console.log(error);
-    res.send(error(505, "Error occusred"));
+    console.error(err);
+    res.send(error(500, "An error occurred while fetching matchday data."));
+    return;
   }
 };
+
 
 const createMatchdaySessionController = async (req: Request, res: Response) => {
   try {
