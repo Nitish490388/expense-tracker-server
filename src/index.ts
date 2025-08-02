@@ -3,21 +3,22 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 import passport from "passport";
 import session from "express-session";
-import playerRouter from "../src/routes/players";
-import expenseRouter from "../src/routes/expense";
-import equipmentRouter from "../src/routes/equipment";
-import matchdayRouter from "../src/routes/matchday";
-import contributionRouter from "../src/routes/contribution";
-import galleryAdmin from "../src/routes/admin/gallery";
-import gallery from "../src/routes/gallery";
+import playerRouter from "./routes/players";
+
+import expenseRouter from "./routes/expense";
+import equipmentRouter from "./routes/equipment";
+import matchdayRouter from "./routes/matchday";
+import contributionRouter from "./routes/contribution";
+import galleryAdmin from "./routes/admin/gallery";
+import gallery from "./routes/gallery";
 import auth from "./routes/auth";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import "./config/passport";
 import verifyToken from "./middlewares/verifyUser";
-import appRouter from "../src/routes/appRouter";
-import "../src/cron/contributionJob";
-import refundRouters from "../src/routes/refund"
+import appRouter from "./routes/appRouter";
+import "./cron/contributionJob";
+import refundRouters from "./routes/refund"
 
 import http from "http";
 import WebSocket, { WebSocketServer } from "ws";
