@@ -11,7 +11,7 @@ router.get(
 
   router.get(
     '/google/callback',
-    passport.authenticate('google', { failureRedirect: '/auth',  session: false  }),
+    passport.authenticate('google', { failureRedirect: 'https://karnival-kings.vercel.app/auth',  session: false  }),
     (req: Request, res: Response) => {
       // Successful authentication
       const user = req.user as any;
