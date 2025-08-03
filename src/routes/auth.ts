@@ -27,7 +27,7 @@ router.get(
         maxAge: 24 * 60 * 60 * 1000 * 3,
       });
       
-      res.redirect(`https://karnival-kings.vercel.app/cashflow`);
+      res.redirect(`${process.env.GOOGLE_CALLBACK_URL as string}`);
     }
   );
 

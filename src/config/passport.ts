@@ -1,7 +1,5 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy, Profile } from "passport-google-oauth20";
-import { Request } from "express";
-import { log } from "console";
 import { PrismaClient } from "@prisma/client";
 
 interface User {
@@ -17,7 +15,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      callbackURL: "/auth/google/callback",
+      callbackURL: process.env.GOOGLE_CALLBACK_URL as string,
     },
     async (accessToken, refreshToken, profile, done) => {
       // Code to handle user authentication and retrieval
