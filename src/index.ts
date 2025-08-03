@@ -73,6 +73,7 @@ app.use("/api/v1/gallery", gallery);
 
 const httpServer = app.listen(PORT, () => {
     console.log("Server is started and running at port no: ", PORT);
+    console.log("Using Google Callback URL:", process.env.GOOGLE_CALLBACK_URL);
 });
 
 // websocket
