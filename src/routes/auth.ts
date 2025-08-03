@@ -27,7 +27,7 @@ router.get(
         maxAge: 24 * 60 * 60 * 1000 * 3,
       });
       
-      res.redirect("http://localhost:5173/cashflow")
+      res.redirect(`${process.env.CORS_URL}/cashflow`);
     }
   );
 
