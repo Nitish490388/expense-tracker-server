@@ -89,11 +89,13 @@ const signinController = async (req: Request, res: Response) => {
       }
     );
     res.cookie("token", token, {
-      // path: "/",
-      // sameSite: "lax",
-      // httpOnly: true,
+      path: "/",
+      sameSite: "none",
+      secure: true,
+      httpOnly: false,
       expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
     });
+
     res.send(success(201, { token }));
     return;
   } catch (err) {
