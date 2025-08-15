@@ -11,7 +11,7 @@ router.get(
 
   router.get(
     '/google/callback',
-    passport.authenticate('google', { failureRedirect: 'http://karnivalkings.s3-website.eu-north-1.amazonaws.com/auth',  session: false  }),
+    passport.authenticate('google', { failureRedirect: 'https://karnival-kings-client.onrender.com/',  session: false  }),
     (req: Request, res: Response) => {
       // Successful authentication
       const user = req.user as any;
@@ -27,7 +27,7 @@ router.get(
         maxAge: 24 * 60 * 60 * 1000 * 3,
       });
       
-      res.redirect(`http://karnivalkings.s3-website.eu-north-1.amazonaws.com/cashflow`);
+      res.redirect(`https://karnival-kings-client.onrender.com/cashflow`);
     }
   );
 
