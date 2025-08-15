@@ -23,6 +23,7 @@ import refundRouters from "./routes/refund"
 import http from "http";
 import WebSocket, { WebSocketServer } from "ws";
 import { ensureApproved } from "./middlewares/ensureApproved";
+import path from "path";
 
 
 
@@ -70,6 +71,10 @@ app.use("/api/v1/contributions",verifyToken,ensureApproved, contributionRouter);
 app.use("/api/v1/refunds",verifyToken,ensureApproved, refundRouters);
 app.use("/api/v1/admin/gallery", galleryAdmin);
 app.use("/api/v1/gallery", gallery);
+
+app.use((req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
 
 const httpServer = app.listen(PORT, () => {
     console.log("Server is started and running at port no: ", PORT);
