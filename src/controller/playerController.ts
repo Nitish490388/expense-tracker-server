@@ -88,12 +88,21 @@ const signinController = async (req: Request, res: Response) => {
         expiresIn: "3d",
       }
     );
+    // res.cookie("token", token, {
+    //   domain: "karnival-kings-client.onrender.com",
+    //   path: "/",
+    //   sameSite: "none",
+    //   secure: true,
+    //   httpOnly: false,
+    //   expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
+    // });
+
     res.cookie("token", token, {
+      httpOnly: false, // so React can read it
+      secure: true, // Render uses HTTPS
+      sameSite: "lax",  // since frontend & backend are "same" now
       path: "/",
-      sameSite: "none",
-      secure: true,
-      httpOnly: false,
-      expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3), // 3 days
     });
 
     res.send(success(201, { token }));
@@ -128,12 +137,12 @@ const getAllPlayers = async (req: Request, res: Response) => {
 
 const markPlayerAsApproved = async (req: Request, res: Response) => {
   try {
-    const { id, isApproved} = req.body;
+    const { id, isApproved } = req.body;
     const updated = await Prisma.player.update({
       where: { id },
       data: { isApproved },
     });
-    res.send(success(201, {result: "Player marked as approved"}));
+    res.send(success(201, { result: "Player marked as approved" }));
   } catch (err) {
     console.log(error);
     res.send(error(505, "Error occusred"));
@@ -144,10 +153,10 @@ const getNotApprovedPlayers = async (req: Request, res: Response) => {
   try {
     const players = await Prisma.player.findMany({
       where: {
-        isApproved: false
-      }
-    })
-    res.send(success(201, {players}));
+        isApproved: false,
+      },
+    });
+    res.send(success(201, { players }));
   } catch (err) {
     console.log(error);
     res.send(error(505, "Error occusred"));
@@ -161,5 +170,5 @@ export {
   logoutController,
   getAllPlayers,
   markPlayerAsApproved,
-  getNotApprovedPlayers
+  getNotApprovedPlayers,
 };
