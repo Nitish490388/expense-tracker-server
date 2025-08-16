@@ -88,22 +88,22 @@ const signinController = async (req: Request, res: Response) => {
         expiresIn: "3d",
       }
     );
+    // res.cookie("token", token, {
+    //   path: "/",
+    //   sameSite: "none",
+    //   secure: true,
+    //   httpOnly: false,
+    //   expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
+    // });
+
     res.cookie("token", token, {
-      domain: "karnival-kings-client.onrender.com",
       path: "/",
+      domain: ".onrender.com", // This allows the cookie to be shared across subdomains
       sameSite: "none",
       secure: true,
       httpOnly: false,
       expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
     });
-
-    // res.cookie("token", token, {
-    //   httpOnly: false, // so React can read it
-    //   secure: true, // Render uses HTTPS
-    //   sameSite: "lax",  // since frontend & backend are "same" now
-    //   path: "/",
-    //   expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 3), // 3 days
-    // });
 
     res.send(success(201, { token }));
     return;
