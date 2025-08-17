@@ -20,12 +20,13 @@ router.get(
         expiresIn: "3d",
       });
 
-      res.cookie('token', token, {
-        // httpOnly: true,
-        // secure: process.env.NODE_ENV === 'production',
-        // sameSite: 'lax', // or 'none' if cross-origin and HTTPS
-        maxAge: 24 * 60 * 60 * 1000 * 3,
-      });
+       res.cookie("token", token, {
+      path: "/",
+      sameSite: "none",
+      secure: true,
+      httpOnly: true, // safer
+      expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
+    });
       
       res.redirect(`https://karnival-kings-client.onrender.com/cashflow`);
     }

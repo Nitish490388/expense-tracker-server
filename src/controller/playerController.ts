@@ -44,10 +44,11 @@ const signupController = async (req: Request, res: Response) => {
       expiresIn: "3d",
     });
 
-    res.cookie("token", token, {
-      // path: "/",
-      // sameSite: "lax",
-      // httpOnly: true,
+     res.cookie("token", token, {
+      path: "/",
+      sameSite: "none",
+      secure: true,
+      httpOnly: true, // safer
       expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
     });
     res.send(success(201, { token }));
