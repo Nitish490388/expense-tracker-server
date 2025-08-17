@@ -98,10 +98,9 @@ const signinController = async (req: Request, res: Response) => {
 
     res.cookie("token", token, {
       path: "/",
-      domain: ".onrender.com", // This allows the cookie to be shared across subdomains
       sameSite: "none",
       secure: true,
-      httpOnly: false,
+      httpOnly: true, // safer
       expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
     });
 
