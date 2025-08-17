@@ -17,7 +17,7 @@ interface JwtPayload {
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     try {
       const token = req.cookies.token;
-  
+      console.log("from verify user",token);
     if (!token) {
       res.status(401).json({ message: "No token provided, unauthorized." });
       return;
