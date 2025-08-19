@@ -16,19 +16,11 @@ router.get(
       // Successful authentication
       const user = req.user as any;
       const secret = process.env.JWT_SECRET || "";
+      
       const token = jwt.sign( { id: user.id, email: user.email }, secret, {
         expiresIn: "3d",
       });
-
-       res.cookie("token", token, {
-      path: "/",
-      sameSite: "none",
-      secure: true,
-      httpOnly: true, // safer
-      expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
-    });
-      
-      res.redirect(`https://karnival-kings-client.onrender.com/cashflow`);
+      res.redirect(`https://karnival-kings-client.onrender.com/setToken?token=${token}`);
     }
   );
 
@@ -38,7 +30,7 @@ router.get(
         console.error('Logout error:', err);
         return res.status(500).send('Logout failed');
       }
-      res.redirect('/');
+      res.redirect('https://karnival-kings-client.onrender.com/');
     });
   });  
 

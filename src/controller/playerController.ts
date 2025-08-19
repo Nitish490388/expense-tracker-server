@@ -43,14 +43,7 @@ const signupController = async (req: Request, res: Response) => {
     const token = jwt.sign({ id: user.id, email: user.email }, secret, {
       expiresIn: "3d",
     });
-
-     res.cookie("token", token, {
-      path: "/",
-      sameSite: "none",
-      secure: true,
-      httpOnly: true, // safer
-      expires: new Date(Date.now() + 1000 * 24 * 60 * 60 * 3),
-    });
+    
     res.send(success(201, { token }));
     return;
   } catch (err) {
@@ -115,7 +108,7 @@ const signinController = async (req: Request, res: Response) => {
 
 const logoutController = (req: Request, res: Response) => {
   try {
-    res.clearCookie("token");
+    
     // req.session = null;
 
     res.send(success(200, { msg: "user logged out successfully" }));
